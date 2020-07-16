@@ -1,17 +1,1 @@
-MusicApp:
-    ListPage:
-    PlayingPage:
 
-<ListPage>:
-    Screen:
-        BoxLayout:
-            layout.orientation = "vertical"
-            MDToolbar:
-                title="Music"
-            ScrollView:
-                MDList:
-                    [for  i in root.music]
-                        TwoLineListItem:
-                            text : i['meta']['title'] or "Unkown" 
-                            secondary_text : i['meta']['artist'] or 'Unkown'
-                            id : i['path']
