@@ -18,7 +18,20 @@ from kivy.core.window import Window
 from kivy.uix.image import Image
 from kivy.uix.label import Label
 
+import getpass
+import platform
 
+
+USER = getpass.getuser()
+
+PLATFORM = platform.system()
+
+MUSIC_DIR = {
+'Windows':'C:\\Users\\'+USER+'\\Music',
+'Linux': '',
+'Darwin': '',
+'Android': ''
+}
 
 
 class Player():
@@ -63,8 +76,7 @@ class PlayingPage(BoxLayout):
     def __init__(self ):
         super().__init__()
         self.pointer= 0
-        self.state_ = {"isPlaying": True,
-                       "title": "Test Title", "artist": "J. Cole","lenght":100.0}
+        self.state_ = {"isPlaying": True,"title": "Test Title", "artist": "J. Cole","lenght":100.0}
         self.orientation = "vertical"
         self.toolbar = MDToolbar(title="Now Playing")
         self.toolbar.left_action_items = [["arrow-left", self.back]]
@@ -132,7 +144,7 @@ class ListPage(BoxLayout):
     def __init__(self):
         super().__init__()
         self.row = 2
-        self.music_list = get_all_music('C:\\Users\\roseBlack\\Music')
+        self.music_list = get_all_music(MUSIC_DIR[PLATFORM])
         self.orientation = "vertical"
         self.toolbar = MDToolbar(title="Music Player")
         self.toolbar.right_action_items = [
@@ -141,14 +153,20 @@ class ListPage(BoxLayout):
         scroll_list = ScrollView()
         dml = MDList()
         self.counter = 0
-        for music in self.music_list:
-            meta = music['meta']
-            path = music['path']
-            self.dl = (TwoLineListItem(
-                text=meta['title'] or "Unkown", secondary_text=meta['artist'] or 'Unkown', id=str(self.counter)))
-            self.dl.bind(on_press=self.to_playing)
-            dml.add_widget(self.dl)
-            self.counter += 1
+        try:
+            for music in self.music_list:
+                meta = music['meta']
+                path = music['path']
+                self.dl = TwoLineListItem(text=(meta['title'] or path), secondary_text=(meta['artist'] or 'Unkown'))
+                self.dl.id=str(self.counter)
+                self.dl.bind(on_press=self.to_playing)
+                dml.add_widget(self.dl)
+                self.counter += 1
+        except Exception as e:
+            print(e)
+            # raise e
+       
+
         scroll_list.add_widget(dml)
         self.add_widget(scroll_list)
 
@@ -211,6 +229,7 @@ def get_all_music(path):
     music_list = []
     for root, dirnames, filenames in os.walk(path):
         for nm in filenames:
+            print(nm);
             if os.path.splitext(nm)[1] == ".mp3":
                 music_list.append({"path": str(os.path.join(
                     root, nm)), "meta": get_meta(str(os.path.join(root, nm)))})
@@ -218,7 +237,10 @@ def get_all_music(path):
 
 
 def get_meta(music):
-    metadata = audio_metadata.load(music)
+    try:
+        metadata = audio_metadata.load(music)
+    except Exception as e:
+        print(e)
     duration = None
     artist = None
     title = None
@@ -234,6 +256,7 @@ def get_meta(music):
         duration = str(metadata['streaminfo']['duration'])
     except:
         pass
+    print(artist,duration,title)
     return {"artist": artist, "duration": duration, "title": title}
 
 
