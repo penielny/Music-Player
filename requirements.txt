@@ -14,7 +14,7 @@ Kivy-Garden==0.1.4
 kivymd==0.104.2
 more-itertools==8.8.0
 pendulum==2.1.2
-Pillow==8.3.1
+Pillow==8.3.2
 pprintpp==0.4.0
 Pygments==2.9.0
 pypiwin32==223
